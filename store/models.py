@@ -1,7 +1,25 @@
 from django.db import models
 
+"""
+    *Foreign Key represents One to Many Relationship
+    *A customer can have multiple address. So it's a one-to-many
+    relationship thats why we use ForeignKEY.
+    *A Promotion can have multiple product and vice-verca. So its a 
+    many-to-many relationship
+    *on_delete = models.CASCADE-> when we want to delete the addresses associated
+    with customer.
+    *model.PROTECT--> Say for example we deleted the Collection,
+    but we don't want to delete Product.
+    
+"""
+
 class Collection(models.Model):
     title = models.CharField(max_length=255)
+    featured_product= models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name="+")
+
+class Promtion(models.Model):
+    description = models.CharField(max_length=255)
+    discount = models.FloatField()
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -9,6 +27,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=6,decimal_places=2)
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    product = models.ManyToManyField(Promtion)
 
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
@@ -23,7 +42,7 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=12)
     last_name = models.CharField(max_length=8)
     email = models.EmailField(unique=True)
-    phone = models.IntegerField(max_length=11)
+    phone = models.IntegerField()
     birtdate = models.DateField(null=True)
     choices = models.CharField(max_length=1,choices=MEMBERSHIP_CHOICE, default=MEMBERSHIP_BRONZE)
 
@@ -58,13 +77,3 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
-
-"""
-    Foreign Key represents One to Many Relationship
-    A customer can have multiple address. So it's a one-to-many
-    relationship thats why we use ForeignKEY.
-    on_delete = models.CASCADE-> when we want to delete the addresses associated
-    with customer... model.PROTECT--> Say for example we deleted the Collection,
-    but we don't want to delete Product.
-
-"""
