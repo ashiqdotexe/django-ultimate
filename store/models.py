@@ -8,7 +8,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=6,decimal_places=2)
     last_update = models.DateTimeField(auto_now=True)
-    collectopm = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
 
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
@@ -26,6 +26,12 @@ class Customer(models.Model):
     phone = models.IntegerField(max_length=11)
     birtdate = models.DateField(null=True)
     choices = models.CharField(max_length=1,choices=MEMBERSHIP_CHOICE, default=MEMBERSHIP_BRONZE)
+
+class Adress(models.Model):
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
     
 class Order(models.Model):
     PAYMENT_PENDING = 'P'
@@ -40,9 +46,25 @@ class Order(models.Model):
     choices = models.CharField(max_length=255, choices=PAYMENT_STATUS, default=PAYMENT_PENDING)
     customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
 
-class Adress(models.Model):
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    quantity = models.PositiveSmallIntegerField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
 
+class Cart(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
 
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField()
+
+"""
+    Foreign Key represents One to Many Relationship
+    A customer can have multiple address. So it's a one-to-many
+    relationship thats why we use ForeignKEY.
+    on_delete = models.CASCADE-> when we want to delete the addresses associated
+    with customer... model.PROTECT--> Say for example we deleted the Collection,
+    but we don't want to delete Product.
+
+"""
