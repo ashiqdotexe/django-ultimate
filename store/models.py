@@ -42,7 +42,7 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=12)
     last_name = models.CharField(max_length=8)
     email = models.EmailField(unique=True)
-    phone = models.IntegerField()
+    phone = models.CharField(max_length=20)
     birtdate = models.DateField(null=True)
     choices = models.CharField(max_length=1,choices=MEMBERSHIP_CHOICE, default=MEMBERSHIP_BRONZE)
 
