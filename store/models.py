@@ -44,7 +44,7 @@ class Customer(models.Model):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
     birtdate = models.DateField(null=True)
-    choices = models.CharField(max_length=1,choices=MEMBERSHIP_CHOICE, default=MEMBERSHIP_BRONZE)
+    choices = models.CharField(max_length=15,choices=MEMBERSHIP_CHOICE, default=MEMBERSHIP_BRONZE)
 
 class Adress(models.Model):
     street = models.CharField(max_length=255)
