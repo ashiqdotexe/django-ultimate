@@ -7,10 +7,15 @@
     {% endif %}
     <ul>
       
-      {% for customer in customers %}
-      <!-- <li>{{ product.title }}</li> -->
-      <li>{{ customer.email }}</li>
-      {% endfor %}
+      
+      {%if products %}
+      <h1>{{products.title}}</h1>
+      <h1>{{products.unit_price}}</h1>
+      {% else %}
+      <h1>Hello World</h1>
+      {% endif %}
+      <!-- <li>{{ customer.email }}</li> -->
+      
     </ul>
   </body>
 </html>
