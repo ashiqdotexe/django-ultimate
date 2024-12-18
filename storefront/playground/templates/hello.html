@@ -6,15 +6,16 @@
     <h1>Hello World</h1>
     {% endif %}
     <ul>
+    <ul>
       
+        {% for product in products %}
+        <li>{{product.title}}</li>
+        {% endfor %}
       
-      {%if products %}
-      <h1>{{products.title}}</h1>
-      <h1>{{products.unit_price}}</h1>
-      {% else %}
-      <h1>Hello World</h1>
-      {% endif %}
-      <!-- <li>{{ customer.email }}</li> -->
+    </ul>  
+    
+    
+      
       
     </ul>
   </body>
