@@ -6,11 +6,17 @@
     <h1>Hello World</h1>
     {% endif %}
     <ul>
+    <ul>
       
-      {% for customer in customers %}
-      <!-- <li>{{ product.title }}</li> -->
-      <li>{{ customer.email }}</li>
-      {% endfor %}
+        {% for order in orders %}
+        <li>{{order.payment_status}} - {{order.customer_id}}</li>
+        {% endfor %}
+      
+    </ul>  
+    
+    
+      
+      
     </ul>
   </body>
 </html>
