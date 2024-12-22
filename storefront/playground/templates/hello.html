@@ -8,8 +8,8 @@
     <ul>
     <ul>
       
-        {% for product in products %}
-        <li>{{product.title}} $ {{product.unit_price}} $ {{product.product_id}}</li>
+        {% for order in orders %}
+        <li>{{order.payment_status}} - {{order.customer_id}}</li>
         {% endfor %}
       
     </ul>  
