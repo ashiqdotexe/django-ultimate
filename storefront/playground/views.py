@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from store.models import Product, OrderItem, Order
 from store.models import Customer
-from django.db.models import Q, F
+from django.db.models import Q, F, Count
 
 
 def say_hello(request):
@@ -15,8 +15,15 @@ def say_hello(request):
     query_set2 = Customer.objects.filter(
         Q(membership__icontains="B") & Q(first_name__startswith="F")
     )
+    # Grouping data
+    grp_data = Customer.objects.annotate(order_count=Count("order"))
     return render(
         request,
         "hello.html",
-        {"name": "Mosh", "orders": list(query_set), "customers": query_set2},
+        {
+            "name": "Mosh",
+            "orders": list(query_set),
+            "customers": query_set2,
+            "grp_data": grp_data,
+        },
     )
