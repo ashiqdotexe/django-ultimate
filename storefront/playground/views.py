@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from store.models import Product, OrderItem, Order
 from store.models import Customer
-from django.db.models import Q, F, Count
+from django.db.models import Q, F, Count, ExpressionWrapper, DecimalField
 
 
 def say_hello(request):
@@ -17,6 +17,9 @@ def say_hello(request):
     )
     # Grouping data
     grp_data = Customer.objects.annotate(order_count=Count("order"))
+    discounted_price = ExpressionWrapper(
+        F("unit_price") * 0.8, output_field=DecimalField()
+    )
     return render(
         request,
         "hello.html",
@@ -25,5 +28,6 @@ def say_hello(request):
             "orders": list(query_set),
             "customers": query_set2,
             "grp_data": grp_data,
+            "discounted_price": discounted_price,
         },
     )
