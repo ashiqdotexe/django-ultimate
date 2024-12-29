@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from store.models import Product, OrderItem, Order
 from store.models import Customer
-from django.db.models import Q, F
+from django.db.models import Q, F, Count, ExpressionWrapper, DecimalField
 
 
 def say_hello(request):
@@ -12,11 +12,20 @@ def say_hello(request):
         .prefetch_related("orderitem_set")
         .order_by("-placed_at")[:5]
     )
-    query_set2 = Customer.objects.filter(
-        Q(membership__icontains="B") & Q(first_name__startswith="F")
+
+    # Grouping data
+    grp_data = Customer.objects.annotate(order_count=Count("order"))
+    discounted_price = ExpressionWrapper(
+        F("unit_price") * 0.8, output_field=DecimalField()
     )
+    query_set2 = Product.objects.annotate(discounted_price=discounted_price)
     return render(
         request,
         "hello.html",
-        {"name": "Mosh", "orders": list(query_set), "customers": query_set2},
+        {
+            "name": "Mosh",
+            "orders": list(query_set),
+            "products": query_set2,
+            "grp_data": grp_data,
+        },
     )
