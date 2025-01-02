@@ -17,11 +17,12 @@
       {% for data in grp_data %}
         <li>{{data.first_name}} - {{data.order_count}}</li>
       {% endfor %}
-      {% for data in grp_data %}
-        <li>{{data.first_name}} - {{data.order_count}}</li>
+    </ul>
+    <ul>
+      {% for product in products %}
+        <li>{{product.title}} - {{product.discounted_price}}</li>
       {% endfor %}
     </ul>
-    
     
       
       
