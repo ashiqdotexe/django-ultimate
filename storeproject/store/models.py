@@ -1,4 +1,6 @@
 from django.db import models
+class Collection(models.Model):
+    title = models.CharField(max_length=255)
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -6,7 +8,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digit=6, decimal_places=2)
     inventory = models.IntegerField()
     last_updated = models.DateTimeField(auto_now=True)
-
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
 class Customer(models.Model):
     BRONZE = "B"
     SILVER = "S"
@@ -36,3 +38,13 @@ class Order(models.Model):
 
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_status = models.CharField(max_length=255, choices=ORDER_CHOICES)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
+
+
+class Adresses(models.Model):
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+    
