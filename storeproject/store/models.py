@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import timedelta
+
 class Collection(models.Model):
     title = models.CharField(max_length=255)
 
