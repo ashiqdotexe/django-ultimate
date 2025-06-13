@@ -1,8 +1,14 @@
 from django.db import models
 from datetime import timedelta
 
+
 class Collection(models.Model):
     title = models.CharField(max_length=255)
+
+
+class Promotion(models.Model):
+    title = models.CharField(max_length=255)
+
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -11,15 +17,18 @@ class Product(models.Model):
     inventory = models.IntegerField()
     last_updated = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    promotion = models.ManyToManyField(Promotion, related_name="products")
+
+
 class Customer(models.Model):
     BRONZE = "B"
     SILVER = "S"
-    GOLD ="G"
+    GOLD = "G"
 
     MEMBERSHIP_CHOICES = [
-        (BRONZE , "B"),
-        (SILVER , "S"),
-        (GOLD , "G"),
+        (BRONZE, "B"),
+        (SILVER, "S"),
+        (GOLD, "G"),
     ]
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -27,10 +36,12 @@ class Customer(models.Model):
     phone = models.IntegerField(max_length=15)
     birth_date = models.DateField(null=True)
     membership = models.CharField(max_length=255, choices=MEMBERSHIP_CHOICES)
+
+
 class Order(models.Model):
     PENDING = "P"
     COMPLETE = "C"
-    FAILED ="F"
+    FAILED = "F"
 
     ORDER_CHOICES = [
         (PENDING, "Pending"),
@@ -42,23 +53,25 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=255, choices=ORDER_CHOICES)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
 
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     unit_price = models.IntegerField()
     quantity = models.PositiveSmallIntegerField()
 
+
 class Cart(models.Model):
-    created_at= models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
 
+
 class Adresses(models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-
-    
