@@ -1,8 +1,16 @@
 from django.contrib import admin
 from . import models
+from django.db.models import Count
 
-
-admin.site.register(models.Collection)
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ["title", "total_product"]
+    @admin.display(ordering="total_product")
+    def total_product(self, collection):
+        return collection.total_product
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(total_product = Count("product"))
+    
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ["title", "unit_price", "inventory_status", "collection_title"]
