@@ -7,8 +7,8 @@
   <h1>Hello World</h1>
   {% endif %}
   <ul>
-    {% for order in orders %}
-    <li>{{order.id}} - {{order.customer.first_name}}</li>
+    {% for product in products %}
+    <li>{{product.title}}</li>
     {% endfor %}
   </ul>
 </body>
