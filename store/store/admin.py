@@ -31,7 +31,7 @@ class CustomerAdmin(admin.ModelAdmin):
     list_per_page =10
     search_fields = ["first_name__istartswith", "last_name__istartswith"]
     list_filter = ["membership"]
-
+    
 
 
 
@@ -41,7 +41,7 @@ class CustomerAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["customer_name","placed_at"]
 
-
+    autocomplete_fields=["customer"]
 
     list_select_related = ["customer"]
     @admin.display(ordering="customer")
