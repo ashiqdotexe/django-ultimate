@@ -30,7 +30,7 @@ class CustomerAdmin(admin.ModelAdmin):
     list_editable = ["membership"]
     list_per_page =10
     search_fields = ["first_name__istartswith", "last_name__istartswith"]
-
+    list_filter = ["membership"]
 
 
 
