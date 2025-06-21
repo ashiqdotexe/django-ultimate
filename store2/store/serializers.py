@@ -29,7 +29,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ["id", "title", "unit_price", "price_on_tax", "collection"]
+        fields = ['id', 'title', 'unit_price',"price_on_tax", 'inventory', 'collection']
 
 
     def tax_on_price(self, product: Product):

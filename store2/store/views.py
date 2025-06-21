@@ -3,17 +3,35 @@ from rest_framework.decorators import api_view
 from .serializers import ProductSerializer, CollectionSerializer
 from .models import Product, Collection
 from rest_framework.response import Response
+from rest_framework import status
 
-@api_view()
+@api_view(["GET", "POST"])
 def product_list(request):
-    queryset = Product.objects.select_related("collection").all()
-    serializer = ProductSerializer(queryset, many = True, context = {"request": request})
-    return Response(serializer.data)
-@api_view()
+    if request.method == "GET":
+        queryset = Product.objects.select_related("collection").all()
+        serializer = ProductSerializer(queryset, many = True, context = {"request": request})
+        return Response(serializer.data)
+    elif request.method == "POST":
+        serializer  = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception = True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+@api_view(["GET", "PUT", "DELETE"])
 def product_id(request, id):
     product = get_object_or_404(Product, pk=id)
-    serializer = ProductSerializer(product)
-    return Response(serializer.data)
+    if request.method == "GET":
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+    elif request.method == "PUT":
+        serializer = ProductSerializer(product, request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+    elif request.method == "DELETE":
+        if product.orderitem_set.count()>0:
+            return Response({"error" : "cant delete item because order item exist"}, status=status.HTTP_400_BAD_REQUEST)
+        product.delete()
+        return Response({"message": f"item with {id} deleted"}, status=status.HTTP_204_NO_CONTENT)
 @api_view()
 def collection_detail(request, pk):
     collection = get_object_or_404(Collection, pk=pk)
