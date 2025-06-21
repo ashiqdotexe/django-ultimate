@@ -16,7 +16,7 @@ class Collection(models.Model):
         return self.title
 
     class Meta:
-        ordering = ['title']
+        ordering = ['id']
 
 
 class Product(models.Model):
