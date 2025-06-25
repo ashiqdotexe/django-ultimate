@@ -7,7 +7,9 @@ from .serializers import ProductSerializer, CollectionSerializer
 from .models import Product, Collection
 from rest_framework.response import Response
 from rest_framework import status
-
+"""
+API View-->
+"""
 
 # class CollectionList(APIView):
 #     def get(self, request):
@@ -21,16 +23,6 @@ from rest_framework import status
 #         serializer.is_valid(raise_exception=True)
 #         serializer.save()
 #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-"""
-GENERIC View->
-"""
-class CollectionList(ListCreateAPIView):
-    def get_queryset(self):
-        return Collection.objects.annotate(product_count=Count("products")).all()
-    def get_serializer_class(self):
-        return CollectionSerializer
-    def get_parser_context(self, http_request):
-        return {"request": self.request}
 
 class CollectionDetail(APIView):
     def get(self, request, pk):
@@ -57,22 +49,36 @@ class CollectionDetail(APIView):
         return Response(
             {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
         )
+"""
+GENERIC View->
+"""
+class CollectionList(ListCreateAPIView):
+    def get_queryset(self):
+        return Collection.objects.annotate(product_count=Count("products")).all()
+    def get_serializer_class(self):
+        return CollectionSerializer
+    def get_parser_context(self, http_request):
+        return {"request": self.request}
+
+
         
+"""
+API View-->
+"""
 
-
-@api_view(["GET", "POST"])
-def product_list(request):
-    if request.method == "GET":
-        queryset = Product.objects.select_related("collection").all()
-        serializer = ProductSerializer(
-            queryset, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
-    elif request.method == "POST":
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+# @api_view(["GET", "POST"])
+# def product_list(request):
+#     if request.method == "GET":
+#         queryset = Product.objects.select_related("collection").all()
+#         serializer = ProductSerializer(
+#             queryset, many=True, context={"request": request}
+#         )
+#         return Response(serializer.data)
+#     elif request.method == "POST":
+#         serializer = ProductSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET", "PUT", "DELETE"])
@@ -96,3 +102,12 @@ def product_id(request, id):
         return Response(
             {"message": f"item with {id} deleted"}, status=status.HTTP_204_NO_CONTENT
         )
+
+
+class ProductList(ListCreateAPIView):
+    def get_queryset(self):
+        return Product.objects.select_related("collection").all()
+    def get_serializer_class(self):
+        return ProductSerializer
+    def get_serializer_context(self):
+        return {"request": self.request}
