@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from .serializers import ProductSerializer, CollectionSerializer
-from .models import Product, Collection
+from .models import Product, Collection, OrderItem
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
@@ -154,12 +154,13 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     def get_serializer_context(self):
         return {"request": self.request}
-    def delete(self, request, pk):
-        product = get_object_or_404(Product, pk=pk)
-        if product.orderitem_set.count()>0:
-            return Response({"message": "Can't do it because product has item"}, status=status.HTTP_400_BAD_REQUEST)
-        product.delete()
-        return Response({"message": f"Product with id- {pk} has been deleted"})
+    def destroy(self, request, *args, **kwargs):
+        if  OrderItem.objects.filter(product_id = kwargs["pk"]).count() > 0:
+            return  Response(
+                {"error": "cant delete item because order item exist"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
 
 
 class CollectionViewSet(ModelViewSet):
