@@ -7,6 +7,7 @@ from .serializers import ProductSerializer, CollectionSerializer
 from .models import Product, Collection
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
 """
 API View-->
 """
@@ -49,36 +50,11 @@ API View-->
 #         return Response(
 #             {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
 #         )
-"""
-GENERIC View->
-"""
-class CollectionList(ListCreateAPIView):
-    def get_queryset(self):
-        return Collection.objects.annotate(product_count=Count("products")).all()
-    def get_serializer_class(self):
-        return CollectionSerializer
-    def get_parser_context(self, http_request):
-        return {"request": self.request}
 
-class CollectionDetail(RetrieveUpdateDestroyAPIView):
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
-    def delete(self, request, pk):
-        collection = get_object_or_404(
-        Collection.objects.annotate(product_count=Count("products")), pk=pk)
-        if collection.products.count() > 0:
-            return Response(
-                {"error": "cant delete item because order item exist"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        collection.delete()
-        return Response(
-            {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
-        )
-        
-"""
-API View-->
-"""
+
+
+
+
 
 # @api_view(["GET", "POST"])
 # def product_list(request):
@@ -117,25 +93,88 @@ API View-->
 #             {"message": f"item with {id} deleted"}, status=status.HTTP_204_NO_CONTENT
 #         )
 
-"""
-Generic View-->
-"""
-class ProductList(ListCreateAPIView):
-    def get_queryset(self):
-        return Product.objects.select_related("collection").all()
-    def get_serializer_class(self):
-        return ProductSerializer
-    def get_serializer_context(self):
-        return {"request": self.request}
 
-class ProductDetail(RetrieveUpdateDestroyAPIView):
+
+
+
+"""
+GENERIC View->
+"""
+# class CollectionList(ListCreateAPIView):
+#     def get_queryset(self):
+#         return Collection.objects.annotate(product_count=Count("products")).all()
+#     def get_serializer_class(self):
+#         return CollectionSerializer
+#     def get_parser_context(self, http_request):
+#         return {"request": self.request}
+
+# class CollectionDetail(RetrieveUpdateDestroyAPIView):
+#     queryset = Collection.objects.annotate(product_count=Count("products"))
+#     serializer_class = CollectionSerializer
+#     def delete(self, request, pk):
+#         collection = get_object_or_404(
+#         Collection.objects.annotate(product_count=Count("products")), pk=pk)
+#         if collection.products.count() > 0:
+#             return Response(
+#                 {"error": "cant delete item because order item exist"},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+#         collection.delete()
+#         return Response(
+#             {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
+#         )
+        
+
+
+# class ProductList(ListCreateAPIView):
+#     def get_queryset(self):
+#         return Product.objects.select_related("collection").all()
+#     def get_serializer_class(self):
+#         return ProductSerializer
+#     def get_serializer_context(self):
+#         return {"request": self.request}
+
+# class ProductDetail(RetrieveUpdateDestroyAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     def delete(self, request, pk):
+#          product = get_object_or_404(Product, pk=pk)
+#          if product.orderitem_set.count()>0:
+#              return Response({"message":"can't delete"}, status=status.HTTP_400_BAD_REQUEST)
+#          product.delete()
+#          return Response(
+#             {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
+#         )
+
+"""
+Viewset->
+"""
+class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    def get_serializer_context(self):
+        return {"request": self.request}
     def delete(self, request, pk):
-         product = get_object_or_404(Product, pk=pk)
-         if product.orderitem_set.count()>0:
-             return Response({"message":"can't delete"}, status=status.HTTP_400_BAD_REQUEST)
-         product.delete()
-         return Response(
+        product = get_object_or_404(Product, pk=pk)
+        if product.orderitem_set.count()>0:
+            return Response({"message": "Can't do it because product has item"}, status=status.HTTP_400_BAD_REQUEST)
+        product.delete()
+        return Response({"message": f"Product with id- {pk} has been deleted"})
+
+
+class CollectionViewSet(ModelViewSet):
+    queryset = Collection.objects.annotate(product_count = Count("products")).all()
+    serializer_class = CollectionSerializer
+    def get_serializer_context(self):
+        return {"request": self.request}
+    def delete(self, request, pk):
+        collection = get_object_or_404(Collection.objects.annotate(product_count = Count("products")), pk=pk)
+        if collection.products.count() > 0:
+            return Response(
+                {"error": "cant delete item because order item exist"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        collection.delete()
+        return Response(
             {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
         )
