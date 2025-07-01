@@ -3,8 +3,8 @@ from django.db.models import Count
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
-from .serializers import ProductSerializer, CollectionSerializer
-from .models import Product, Collection, OrderItem
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
+from .models import Product, Collection, OrderItem, Review
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
@@ -168,14 +168,18 @@ class CollectionViewSet(ModelViewSet):
     serializer_class = CollectionSerializer
     def get_serializer_context(self):
         return {"request": self.request}
-    def delete(self, request, pk):
-        collection = get_object_or_404(Collection.objects.annotate(product_count = Count("products")), pk=pk)
+    def destroy(self, request, *args, **kwargs):
+        collection = get_object_or_404(Collection.objects.annotate(product_count = Count("products")), pk=kwargs["pk"])
         if collection.products.count() > 0:
             return Response(
-                {"error": "cant delete item because order item exist"},
+                {"error": "cant delete item because product exist"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        collection.delete()
-        return Response(
-            {"message": f"item with {pk} deleted"}, status=status.HTTP_204_NO_CONTENT
-        )
+        return super().destroy(request, *args, **kwargs)
+
+class ReviewViewSet(ModelViewSet):
+    serializer_class = ReviewSerializer
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs["product_pk"])
+    def get_serializer_context(self):
+        return {"product_id": self.kwargs["product_pk"]}
