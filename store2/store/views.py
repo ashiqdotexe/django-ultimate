@@ -11,6 +11,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import ProductFilter
+from .pagination import PaginationNumber
 """
 API View-->
 """
@@ -163,6 +164,7 @@ class ProductViewSet(ModelViewSet):
     search_fields = ["title", "description"]
     ordering_fields =["id","unit_price"]
     serializer_class = ProductSerializer
+    pagination_class = PaginationNumber
     def get_serializer_context(self):
         return {"request": self.request}
     def destroy(self, request, *args, **kwargs):
