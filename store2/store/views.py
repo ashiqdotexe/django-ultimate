@@ -8,6 +8,7 @@ from .models import Product, Collection, OrderItem, Review
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import ProductFilter
 """
@@ -157,8 +158,9 @@ class ProductViewSet(ModelViewSet):
     # if collection_id is not None:
     #     queryset = queryset.filter(collection_id=collection_id)
     # return queryset
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend,SearchFilter]
     filterset_class = ProductFilter
+    search_fields = ["title", "description"]
     serializer_class = ProductSerializer
     def get_serializer_context(self):
         return {"request": self.request}
@@ -169,6 +171,17 @@ class ProductViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return super().destroy(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            {
+                "message": "Product created successfully!",
+                "data": serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 
 class CollectionViewSet(ModelViewSet):
