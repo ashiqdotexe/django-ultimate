@@ -8,7 +8,7 @@ from .models import Product, Collection, OrderItem, Review
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import ProductFilter
 """
@@ -158,9 +158,10 @@ class ProductViewSet(ModelViewSet):
     # if collection_id is not None:
     #     queryset = queryset.filter(collection_id=collection_id)
     # return queryset
-    filter_backends = [DjangoFilterBackend,SearchFilter]
+    filter_backends = [DjangoFilterBackend,SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
     search_fields = ["title", "description"]
+    ordering_fields =["id","unit_price"]
     serializer_class = ProductSerializer
     def get_serializer_context(self):
         return {"request": self.request}
