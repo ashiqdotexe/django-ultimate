@@ -163,8 +163,8 @@ class ProductViewSet(ModelViewSet):
     filterset_class = ProductFilter
     search_fields = ["title", "description"]
     ordering_fields =["id","unit_price"]
-    serializer_class = ProductSerializer
     pagination_class = PaginationNumber
+    serializer_class = ProductSerializer
     def get_serializer_context(self):
         return {"request": self.request}
     def destroy(self, request, *args, **kwargs):
@@ -207,3 +207,5 @@ class ReviewViewSet(ModelViewSet):
         return Review.objects.filter(product_id=self.kwargs["product_pk"])
     def get_serializer_context(self):
         return {"product_id": self.kwargs["product_pk"]}
+
+        
