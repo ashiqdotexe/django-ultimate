@@ -5,11 +5,11 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer,CartSerializer
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer,CartSerializer, CartItemSerializer
 from .models import Product, Collection, OrderItem, Review, Cart, CartItem
 from .filter import ProductFilter
 from .pagination import PaginationNumber
@@ -202,11 +202,6 @@ class CollectionViewSet(ModelViewSet):
             )
         return super().destroy(request, *args, **kwargs)
     
-
-class CartViewSet(CreateModelMixin, GenericViewSet):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
-
     
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
@@ -216,3 +211,12 @@ class ReviewViewSet(ModelViewSet):
         return {"product_id": self.kwargs["product_pk"]}
 
         
+class CartViewSet(CreateModelMixin,DestroyModelMixin,RetrieveModelMixin, GenericViewSet):
+    queryset = Cart.objects.prefetch_related("item__product").all()
+    serializer_class = CartSerializer
+
+
+class CartItemViewSet(ModelViewSet):
+    serializer_class = CartItemSerializer
+    def get_queryset(self):
+        return CartItem.objects.filter(cart_id = self.kwargs["cart_pk"])

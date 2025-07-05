@@ -43,12 +43,39 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def tax_on_price(self, product: Product):
         return product.unit_price * Decimal(1.1)
+    
+
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id", "title", "unit_price"]
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+    total_price = serializers.SerializerMethodField()
+    def get_total_price(self, cart_item: CartItem):
+        return cart_item.quantity * cart_item.product.unit_price
+    class Meta:
+        model = CartItem
+        fields = [
+            "id",
+            "product",
+            "quantity",
+            "total_price"
+        ]
 
 class CartSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    item = CartItemSerializer(many = True, read_only= True)
+    total_price = serializers.SerializerMethodField(read_only= True)
+
+    def get_total_price(self, cart: Cart):
+        return sum([item.quantity * item.product.unit_price for item in cart.item.all()])
     class Meta:
         model = Cart
         fields = [
-            "id"
+            "id","item","total_price"
         ]
 
 
