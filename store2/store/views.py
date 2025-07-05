@@ -3,13 +3,14 @@ from django.db.models import Count
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
-from .models import Product, Collection, OrderItem, Review
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer,CartSerializer
+from .models import Product, Collection, OrderItem, Review, Cart, CartItem
 from .filter import ProductFilter
 from .pagination import PaginationNumber
 """
@@ -200,7 +201,13 @@ class CollectionViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return super().destroy(request, *args, **kwargs)
+    
 
+class CartViewSet(CreateModelMixin, GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+    
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     def get_queryset(self):

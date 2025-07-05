@@ -109,3 +109,7 @@ class OrderAdmin(admin.ModelAdmin):
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "description", "date"]
     autocomplete_fields = ["product"]
+
+@admin.register(models.Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ["created_at"]
