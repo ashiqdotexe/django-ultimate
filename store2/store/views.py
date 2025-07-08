@@ -9,7 +9,7 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyM
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer,CartSerializer, CartItemSerializer, AddCartItemSerializer
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer,CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 from .models import Product, Collection, OrderItem, Review, Cart, CartItem
 from .filter import ProductFilter
 from .pagination import PaginationNumber
@@ -217,9 +217,12 @@ class CartViewSet(CreateModelMixin,DestroyModelMixin,RetrieveModelMixin, Generic
 
 
 class CartItemViewSet(ModelViewSet):
+    http_method_names = ["get", "post", "patch", "delete"]
     def get_serializer_class(self):
         if self.request.method=="POST":
             return AddCartItemSerializer
+        if self.request.method=="PATCH":
+            return UpdateCartItemSerializer
         return CartItemSerializer
     def get_serializer_context(self):
         return {"cart_id" : self.kwargs["cart_pk"]}
