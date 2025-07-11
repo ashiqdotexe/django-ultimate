@@ -72,6 +72,10 @@ class Customer(models.Model):
     class Meta:
         ordering = ["user__first_name", "user__last_name"]
 
+    class Meta:
+        permissions = [
+            ('cancel_order', 'Can cancel order')
+        ]
 
 class Order(models.Model):
     PAYMENT_STATUS_PENDING = "P"
