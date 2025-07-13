@@ -3,6 +3,7 @@ from django.db.models import Count
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
@@ -232,3 +233,14 @@ class CartItemViewSet(ModelViewSet):
 class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    @action(detail=False, methods=["GET", "PUT"])
+    def me(self, request):
+        (customer, valid) = Customer.objects.get_or_create(user_id = request.user.id)
+        if request.method == "GET":
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == "PUT":
+            serializer = CustomerSerializer(customer, request.data)
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
