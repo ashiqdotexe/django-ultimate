@@ -71,10 +71,9 @@ class Customer(models.Model):
         return self.user.last_name
     class Meta:
         ordering = ["user__first_name", "user__last_name"]
-
-    class Meta:
         permissions = [
-            ('cancel_order', 'Can cancel order')
+            ('cancel_order', 'Can cancel order'),
+            ('view_history', "Can View history")
         ]
 
 class Order(models.Model):
