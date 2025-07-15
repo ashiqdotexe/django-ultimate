@@ -16,6 +16,8 @@ from .models import Customer, Product, Collection, OrderItem, Review, Cart, Cart
 from .filter import ProductFilter
 from .pagination import PaginationNumber
 from . import permission
+from . import serializers
+from . import models
 """
 API View-->
 """
@@ -251,3 +253,7 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+class OrderViewSet(ModelViewSet):
+    serializer_class = serializers.OrderSerializer
+    queryset = models.Order.objects.all()
