@@ -255,5 +255,20 @@ class CustomerViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 class OrderViewSet(ModelViewSet):
-    serializer_class = serializers.OrderSerializer
-    queryset = models.Order.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        return {"user_id":self.request.user.id}
+    
+    def get_serializer_class(self):
+        if self.request.method=="POST":
+            return serializers.CreateOrderSerializer
+        return serializers.OrderSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return models.Order.objects.all()
+        (customer_id, created) = Customer.objects.only("id").get_or_create(user_id = user.id)
+        return models.Order.objects.filter(customer_id=customer_id)
