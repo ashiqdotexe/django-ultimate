@@ -255,10 +255,20 @@ class CustomerViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 class OrderViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    
+    http_method_names = ["get", "patch", "delete", "post", "option", "head"]
 
-    def get_serializer_context(self):
-        return {"user_id":self.request.user.id}
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE"]:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.CreateOrderSerializer(data = request.data, context = {"user_id":self.request.user.id})
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        serializer= serializers.OrderSerializer(order)
+        return Response(serializer.data)
     
     def get_serializer_class(self):
         if self.request.method=="POST":

@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.db import transaction
 from rest_framework import serializers
 from .models import Product, Collection, Review, Cart, CartItem, Customer,Order,OrderItem
 
@@ -138,8 +139,31 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ["id","customer","payment_status","placed_at", "item"]
 
 class CreateOrderSerializer(serializers.Serializer):
-    cart_id = serializers.UUIDField()
-    def save(self, **kwargs):
-        print(self.context["user_id"])
-        (customer, created) = Customer.objects.get_or_create(user_id=self.context["user_id"])
-        return Order.objects.create(customer=customer)
+    with transaction.atomic():
+    
+        cart_id = serializers.UUIDField()
+
+        def validate_cart_id(self, cart_id):
+            if not Cart.objects.filter(pk=cart_id).exists():
+                raise serializers.ValidationError("No such cart")
+            if CartItem.objects.filter(cart_id=cart_id).count()==0:
+                raise serializers.ValidationError("No item in the cart")
+            return cart_id
+        
+        def save(self, **kwargs):
+            print(self.context["user_id"])
+            (customer, created) = Customer.objects.get_or_create(user_id=self.context["user_id"])
+            order= Order.objects.create(customer=customer)
+            cart_items = CartItem.objects.select_related("product").filter(cart_id = self.validated_data["cart_id"])
+            order_items = [
+                OrderItem(
+                    order = order,
+                    product = item.product,
+                    unit_price = item.product.unit_price,
+                    quantity = item.quantity
+                )
+                for item in cart_items
+            ]
+            OrderItem.objects.bulk_create(order_items)
+            Cart.objects.filter(pk=self.validated_data["cart_id"]).delete()
+            return order
