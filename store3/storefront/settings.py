@@ -179,3 +179,15 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
 }
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'                # Use your SMTP host
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''    # Use app password for Gmail
+DEFAULT_FROM_EMAIL = 'admin@admin.com'
+ADMINS = [
+    ("Name","admin@admin.com")
+]
