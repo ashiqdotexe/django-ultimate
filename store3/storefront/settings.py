@@ -192,5 +192,13 @@ ADMINS = [
     ("Name","admin@admin.com")
 ]
 
-
+from celery.beat import crontab
+from datetime import timedelta
 CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_BEAT_SCHEDULE = {
+    'notify_user':{
+        "task" : "playground.tasks.notify_user",
+        "schedule": timedelta(seconds=10),
+        "args": ["Hello world"]
+    }
+}
