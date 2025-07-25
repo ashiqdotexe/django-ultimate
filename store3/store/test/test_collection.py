@@ -6,4 +6,4 @@ class TestCollection:
     def test_if_user_is_anonymous_return_404(self):
         client = APIClient()
         response=client.post("/store/collections/", {"title":"A"})
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
