@@ -1,7 +1,12 @@
+import json
 from django.contrib.auth.models import User
 from store.test.conftest import api_client, authenticate
+from store.models import Collection
 from rest_framework import status
 import pytest
+from model_bakery import baker
+
+
 @pytest.fixture
 def create_collection(api_client):
     def do_create_collection(collection):
@@ -38,4 +43,35 @@ class TestCollection:
         response = create_collection({"title":"a"})
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["id"] > 0
+
+
+@pytest.mark.django_db
+class TestRetrieveCollection:
+    def test_if_collection_exist_200(self, api_client):
+        collection = baker.make(Collection)
+        response = api_client.get(f'/store/collections/{collection.id}/')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            "id": collection.id,
+            "title": collection.title,
+            "products_count":0
+        }
+    def test_if_collection_not_exist_404(self, api_client):
+        collection = baker.make(Collection)
+        response = api_client.get(f'/store/collections/999/')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+@pytest.mark.django_db
+class TestUpdateDeleteCollection:
+    def test_update_collection_200(self, api_client, authenticate):
+        authenticate(is_staff = True)
+        collection = baker.make(Collection)
+        response = api_client.patch(f'/store/collections/{collection.id}/', {"title" : "updated title"}, format = "json")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["title"] == "updated title"
     
+    def test_delete_collection_204(self, api_client,authenticate):
+        authenticate(is_staff = True)
+        collection = baker.make(Collection)
+        response = api_client.delete(f'/store/collections/{collection.id}/')
+        assert response.status_code == status.HTTP_204_NO_CONTENT
