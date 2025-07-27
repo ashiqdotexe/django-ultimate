@@ -79,6 +79,8 @@ CORS_ALLOWED_ORIGINS =[
     "http://127.0.0.1:8001"
 ]
 
+
+
 ROOT_URLCONF = 'storefront.urls'
 
 TEMPLATES = [
@@ -200,5 +202,15 @@ CELERY_BEAT_SCHEDULE = {
         "task" : "playground.tasks.notify_user",
         "schedule": timedelta(seconds=10),
         "args": ["Hello world"]
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
