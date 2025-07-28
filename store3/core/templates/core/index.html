@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,10 +7,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
 </head>
 
 <body>
-    <h1>Hello World</h1>
+    <div class="home-page">
+        <img src="{% static 'core/logo.svg' %}" alt="logo" class="logo">
+    </div>
 </body>
 
 </html>
